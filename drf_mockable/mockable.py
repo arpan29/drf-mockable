@@ -1,5 +1,8 @@
 from django.http import JsonResponse
+from django.http.response import HttpResponseBase
+from django.utils.cache import cc_delim_re, patch_vary_headers
 
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 class MockableView(APIView):
@@ -7,33 +10,35 @@ class MockableView(APIView):
     This is the class which will allow you to build Mockable APIs
     """
 
-    def initial(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         """
-        Runs anything that needs to occur prior to calling the method handler.
+        `.dispatch()` is pretty much the same as Django's regular dispatch,
+        but with extra hooks for startup, finalize, and exception handling.
         """
-        self.format_kwarg = self.get_format_suffix(**kwargs)
+        self.args = args
+        self.kwargs = kwargs
+        request = self.initialize_request(request, *args, **kwargs)
+        self.request = request
+        self.headers = self.default_response_headers  # deprecate?
 
-        # Perform content negotiation and store the accepted info on the request
-        neg = self.perform_content_negotiation(request)
-        request.accepted_renderer, request.accepted_media_type = neg
-
-        # Determine the API version, if versioning is in use.
-        version, scheme = self.determine_version(request, *args, **kwargs)
-        request.version, request.versioning_scheme = version, scheme
-
-        # Ensure that the incoming request is permitted
-        self.perform_authentication(request)
-        self.check_permissions(request)
-        self.check_throttles(request)
-        self.check_mockable(request)
-
-
-    def check_mockable(self, request):
-        """
-        """
         try:
-            if str(request.META.get('HTTP_MOCKABLE', "")).lower() == 'yes':
-                return JSONResponse(self.mock_response)
-        except Exception as e:
-            print(repr(e))
-            exit()
+            self.initial(request, *args, **kwargs)
+
+            # Get the appropriate handler method
+            if request.method.lower() in self.http_method_names:
+                handler = getattr(self, request.method.lower(),
+                                  self.http_method_not_allowed)
+            else:
+                handler = self.http_method_not_allowed
+
+            # In case the API is being mocked, send the mock response
+            if str(request.META.get('HTTP_MOCKABLE', "")).lower() == 'true':
+                response = Response(self.mock_response, status=200, content_type="application/json")
+            else:
+                response = handler(request, *args, **kwargs)
+
+        except Exception as exc:
+            response = self.handle_exception(exc)
+
+        self.response = self.finalize_response(request, response, *args, **kwargs)
+        return self.response

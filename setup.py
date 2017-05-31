@@ -2,7 +2,7 @@ from setuptools import setup
 setup(
     name = 'drf_mockable',
     packages = ['drf_mockable'], # this must be the same as the name above
-    version = '0.0.1',
+    version = '0.0.2',
     description = 'A package to help in building mockable APIs based over Django Rest Framework (DRF)',
     author = 'Arpan Gupta',
     author_email = 'arpan29@gmail.com',
