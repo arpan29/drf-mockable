@@ -2,8 +2,8 @@ from setuptools import setup
 setup(
     name = 'drf_mockable',
     packages = ['drf_mockable'], # this must be the same as the name above
-    version = '0.0.2',
-    description = 'A package to help in building mockable APIs based over Django Rest Framework (DRF)',
+    version = '0.0.3',
+    description = 'This package makes building mockable APIs a breeze for Django developers.',
     author = 'Arpan Gupta',
     author_email = 'arpan29@gmail.com',
     url = 'https://github.com/arpan29/drf-mockable', # use the URL to the github repo
