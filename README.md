@@ -2,8 +2,9 @@
 
 This is a package which makes building mockable APIs a breeze for Django developers. The dependencies for this package are:
 
-* Django
-* Django Rest Framework (DRF)
+* Django >= 1.8
+* Django Rest Framework (DRF) >= 3.5
+
 
 ## Installation
 
@@ -14,6 +15,7 @@ pip install drf-mockable
 
 In your view class, just inherit the MockableView and define your mock_response. Thats it !!
 
+```python
 
 from drf_mockable.mockable import MockableView
 
@@ -32,12 +34,17 @@ class MyMockAPI(MockableView):
         '''
         print("Do your stuff here if mocked response is not required")
 
+```
 
 Now, just hit your MockAPI from any REST client with a header 'Mockable' set as 'True' and you should be able to get the mocked response. 
 
 Sample Curl Request: 
 
+```shell
+
 curl -X <MY_HTTP_REQUEST_METHOD> http://<PATH_TO_MY_MOCK_API>/ -H 'content-type: application/json' -H 'mockable: True' -d '<MY_REQUEST_DATA>'
+
+```
 
 In case you do not want the mock response and want the API to run normally, just remove the Mockable header and your API will work normally.
 
@@ -47,7 +54,7 @@ In case you do not want the mock response and want the API to run normally, just
 In the world of APIs and Microservices, it often happens the front-end team (Mobile or UI Development) needs a sample API for testing out their integrations. The backend developers need to create mock APIs to help them in this regard. This package solves two problems which occur during this process:
 
 1) Provide backend developers with a fast & easy way to get the mock APIs up and running.
-2) In case the backend APIs are internally calling other third-party APIs and in case those third-party APIs are down, this will still allow you to keep your API up and running with a mock response.
+2) In case the backend APIs are internally calling other third-party APIs and in case those third-party APIs are down, this will still allow you to keep your API unaffected with a mock response.
 
 
 ## License
