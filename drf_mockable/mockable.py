@@ -1,3 +1,5 @@
+from django.http import JsonResponse
+
 from rest_framework.views import APIView
 
 class MockableView(APIView):
@@ -29,5 +31,9 @@ class MockableView(APIView):
     def check_mockable(self, request):
         """
         """
-        if str(request.META.get('HTTP_MOCKABLE', "")).lower() == 'yes':
-            return self.mock_response
+        try:
+            if str(request.META.get('HTTP_MOCKABLE', "")).lower() == 'yes':
+                return JSONResponse(self.mock_response)
+        except Exception as e:
+            print(repr(e))
+            exit()

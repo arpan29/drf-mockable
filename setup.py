@@ -12,6 +12,7 @@ setup(
     classifiers = [],
     license = 'MIT',
     install_requires=[
+        'Django',
         'djangorestframework',
     ],
     zip_safe=False
